@@ -35,7 +35,6 @@ public class PlayerController : MonoBehaviour
             {
                 if (!checkForBounds())
                 {
-                    Debug.Log(direction);
                     doRaycastStuff();
                 }
             }
@@ -70,21 +69,20 @@ public class PlayerController : MonoBehaviour
         // This would cast rays only against colliders in layer 8.
         // But instead we want to collide against everything except layer 8. The ~ operator does this, it inverts a bitmask.
         layerMask = ~layerMask;
-        Debug.Log(startingPoint + " " + transform.position);
 
         if (Physics.Raycast(transform.position, transform.TransformDirection(rayDirection), out hit, Mathf.Infinity, layerMask))
         {
-            Debug.DrawRay(transform.position, targetPoint * hit.distance, Color.yellow);
             if (hit.distance <= 1)
-            {
-                Debug.Log("Did Hit");
-                Debug.Log(hit.collider);
-                Debug.Log(hit.point);
-
+            { 
                 //LOGIC FOR DETECTING OBJECTS IN FRONT OF YOU
                 if (hit.collider.CompareTag("Collider"))
                 {
                     targetPoint = startingPoint;
+                }
+                if (hit.collider.CompareTag("Pushable"))
+                {
+                    Transform pushableTransform = hit.collider.GetComponent<Transform>();
+                    pushableTransform.position += (targetPoint - startingPoint);
                 }
             }
         }
