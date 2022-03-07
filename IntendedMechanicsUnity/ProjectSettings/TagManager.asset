@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Collider
   - Pushable
+  - MainMenu
   layers:
   - Default
   - TransparentFX
