@@ -26,7 +26,7 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Awake()
     {
-        menu = GameObject.FindGameObjectWithTag("MainMenu");
+        menu = GameObject.Find("PauseMenu");
         respawnPoint = GameObject.Find("RespawnPoint");
         controller = GetComponent<CharacterController>();
         if (_lockCursor)
@@ -41,8 +41,7 @@ public class PlayerController : MonoBehaviour
     {
         if (menu == null)
         {
-            //Debug.Log("null");
-            menu = GameObject.FindGameObjectWithTag("MainMenu");
+            menu = GameObject.Find("PauseMenu");
         }
         UpdateMouseLook();
         UpdateMovement();
@@ -78,9 +77,6 @@ public class PlayerController : MonoBehaviour
          */
         _velocityY += _gravity * Time.deltaTime;
 
-        //Vector3 velocity = new Vector3(targetDir.x, 0, targetDir.y);
-        //velocity.y += _gravity;
-        Debug.Log(numJumps);
         if (controller.isGrounded)
         {
             numJumps = numJumps < 1 ? 1 : numJumps;
@@ -117,7 +113,6 @@ public class PlayerController : MonoBehaviour
 
     public void OnEscape()
     {
-        Debug.Log("escape");
         menuOpen = !menuOpen;
         _lockCursor = !_lockCursor;
         menu.SetActive(menuOpen);
