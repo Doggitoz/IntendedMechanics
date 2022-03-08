@@ -1,7 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Events;
 
 public class PlayerController : MonoBehaviour
 {
@@ -13,12 +15,18 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float _sprintIncrease = 3.0f;
     [SerializeField] float _jumpSpeed = 5.5f;
     [SerializeField] float _gravity = -13.0f;
+    [SerializeField] private Camera playerCamera;
+    [SerializeField] private GameObject pauseMenu;
+    [SerializeField] private GameObject interactUI;
 
-    private GameObject menu;
+    public static UnityEvent respawnPlayer;
+    RaycastHit hit;
+    bool interacting = false;
+    public LayerMask interactableLayermask = 6;
     private GameObject respawnPoint;
     bool menuOpen = false;
     bool sprinting = false;
-    private int numJumps = 5;
+    private int numJumps = 1;
     private float _cameraPitch = 0.0f;
     float _velocityY = 0.0f;
     CharacterController controller = null;
@@ -26,7 +34,10 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Awake()
     {
-        menu = GameObject.Find("PauseMenu");
+        hit = new RaycastHit();
+        respawnPlayer = new UnityEvent();
+        respawnPlayer.AddListener(RespawnPlayer);
+        interactableLayermask = LayerMask.GetMask("Interactable");
         respawnPoint = GameObject.Find("RespawnPoint");
         controller = GetComponent<CharacterController>();
         if (_lockCursor)
@@ -39,12 +50,28 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (menu == null)
+        respawnPoint = GameObject.Find("RespawnPoint");
+        if (pauseMenu == null)
         {
-            menu = GameObject.Find("PauseMenu");
+            pauseMenu = GameObject.Find("PauseMenu");
         }
+        DoRaycastLogic();
         UpdateMouseLook();
         UpdateMovement();
+    }
+
+    private void DoRaycastLogic()
+    {
+        if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.TransformDirection(Vector3.forward), out hit, 2, interactableLayermask))
+        {
+            interacting = true;
+            interactUI.SetActive(true);
+        } 
+        else
+        {
+            interacting = false;
+            interactUI.SetActive(false);
+        }
     }
 
     void UpdateMouseLook()
@@ -97,7 +124,7 @@ public class PlayerController : MonoBehaviour
 
         controller.Move(velocity * Time.deltaTime);
 
-        if (this.transform.position.y < -10)
+        if (transform.position.y < -10)
         {
             RespawnPlayer();
         }
@@ -114,12 +141,26 @@ public class PlayerController : MonoBehaviour
     public void OnEscape()
     {
         menuOpen = !menuOpen;
-        _lockCursor = !_lockCursor;
-        menu.SetActive(menuOpen);
+        ToggleCursor();
+        pauseMenu.SetActive(menuOpen);
+    }
+
+    public void OnInteract()
+    {
+        if (interacting)
+        {
+            hit.collider.GetComponent<OpenDevLog>().Interact();
+        }
     }
 
     public void RespawnPlayer()
     {
-        this.transform.position = respawnPoint.transform.position;
+        transform.position = respawnPoint.transform.position;
+    }
+
+    public void ToggleCursor()
+    {
+        _lockCursor = !_lockCursor;
+        Cursor.visible = !Cursor.visible;
     }
 }

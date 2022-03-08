@@ -6,20 +6,26 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
 
-    public static GameManager instance { get; private set; }
+    public static GameManager instance;
 
     // Start is called before the first frame update
-    void Awake()
+    public static GameManager Instance
     {
-        instance = this;
+        get
+        {
+            if (instance == null)
+            {
+                instance = new GameManager();
+            }
+
+            return instance;
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    public void RespawnLevel()
     {
-        
-    }
 
+    }
     public void changeScene(int index)
     {
         SceneManager.LoadScene(index);
