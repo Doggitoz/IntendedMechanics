@@ -50,6 +50,7 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        _mouseSensitivity = GameManager.Instance.mouseSensitivity;
         respawnPoint = GameObject.Find("RespawnPoint");
         if (pauseMenu == null)
         {
@@ -124,7 +125,7 @@ public class PlayerController : MonoBehaviour
 
         controller.Move(velocity * Time.deltaTime);
 
-        if (transform.position.y < -10)
+        if (transform.position.y < -9)
         {
             RespawnPlayer();
         }
